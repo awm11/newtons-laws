@@ -63,6 +63,27 @@ const PlayPause = ({ paused, setPaused }) => (
 );
 const Keys = ({ children }) => <p className="keys">{children}</p>;
 const K = ({ children }) => <kbd>{children}</kbd>;
+// The challenge: a slim invitation at the top of the panel; once started, a full card with its own way out
+function ChallengeBar({ title, blurb, onStart }) {
+  return (
+    <div className="chbar">
+      <div className="chbar-txt"><span className="eyebrow">Challenge</span><b>{title}</b><small>{blurb}</small></div>
+      <button type="button" className="btn primary" onClick={blur(onStart)}>Start</button>
+    </div>
+  );
+}
+function ChallengeCard({ title, onExit, children }) {
+  return (
+    <figure className="fig challenge on">
+      <div className="fighead">
+        <div className="chtitle"><span className="eyebrow">Challenge</span><h2>{title}</h2></div>
+        <button type="button" className="btn ghost exitbtn" onClick={blur(onExit)}>Exit challenge</button>
+      </div>
+      {children}
+    </figure>
+  );
+}
+
 function Rounds({ n, value, onPick, won }) {
   return (
     <div className="rounds" role="group" aria-label="Round">
@@ -151,10 +172,8 @@ export function Mode1Panel({ snap, sim, paused, setPaused, reset, refresh }) {
       </Fig>
       <Fig title="What is happening">
         <Rules items={RULES1} active={[net ? 0 : snap.firing ? 1 : moving ? 2 : 3]} /></Fig>
-      <Fig title="Challenge: Mothership" className="challenge" actions={
-        <Seg label="Challenge" value={c ? 'on' : 'off'} onChange={v => setCh(v === 'on')} options={[{ value: 'off', label: 'Free flight' }, { value: 'on', label: 'Mothership' }]} />}>
-        {c ? (
-          <>
+      {c ? (
+        <ChallengeCard title="Dock with the mothership" onExit={() => setCh(false)}>
             <div className="chrow">
               <Rounds n={3} value={c.round} won={c.won} onPick={i => setCh(true, i)} />
               {c.won ? <span className="pass">Docked!</span> : c.crash ? <span className="fail">Crash! Starting again…</span> : <span className="chnote">Round {c.round + 1} of 3</span>}
@@ -164,9 +183,8 @@ export function Mode1Panel({ snap, sim, paused, setPaused, reset, refresh }) {
               <button className="btn ghost" onClick={blur(reset)}>Try again</button>
               {c.won && c.round < 2 && <button className="btn primary" onClick={blur(() => setCh(true, c.round + 1))}>Next round</button>}
             </div>
-          </>
-        ) : <p className="hint">Dock with a drifting mothership: come to rest relative to it, inside its docking bay. Three rounds.</p>}
-      </Fig>
+        </ChallengeCard>
+      ) : <ChallengeBar title="Dock with the mothership" blurb="Come to rest inside its docking bay. Three rounds." onStart={() => setCh(true)} />}
       <div className="deck">
         <PlayPause paused={paused} setPaused={setPaused} />
         {!c && <button className="btn ghost" onClick={blur(reset)}>Reset</button>}
@@ -214,7 +232,7 @@ function Equation({ F, m, a }) {
   );
 }
 
-function FormationPanel({ snap, sim, refresh }) {
+function FormationPanel({ snap, sim, refresh, paused, setPaused }) {
   const c = snap.challenge;
   const setCh = (on, round = 0) => { sim.setChallenge(on, round); refresh(); };
   const setKN = (i, kN) => { sim.setKN(i, kN); sim.challenge.sel = i; refresh(); };
@@ -246,6 +264,7 @@ function FormationPanel({ snap, sim, refresh }) {
         {c.phase === 'set' && <button className="btn primary launch" onClick={blur(() => { sim.launch(); refresh(); })}>Launch</button>}
         {c.phase !== 'set' && <button className={'btn ' + (c.phase === 'done' && !c.success ? 'primary' : 'ghost')} onClick={blur(() => { sim.resetRound(); refresh(); })}>Try again</button>}
         {c.phase === 'done' && c.success && c.round < 2 && <button className="btn primary" onClick={blur(() => setCh(true, c.round + 1))}>Next round</button>}
+        <PlayPause paused={paused} setPaused={setPaused} />
         {c.phase === 'done' && <span className={c.success ? 'pass' : 'fail'}>{c.success ? 'Perfect formation!' : 'Not the same acceleration'}</span>}
       </div>
       <Keys><K>↑</K><K>↓</K> pick a ship, <K>←</K><K>→</K> or <K>1</K>–<K>9</K>, <K>0</K> set its force</Keys>
@@ -256,15 +275,11 @@ function FormationPanel({ snap, sim, refresh }) {
 export function Mode2Panel({ snap, sim, paused, setPaused, reset, refresh }) {
   const c = snap.challenge;
   const setCh = on => { sim.setChallenge(on, 0); refresh(); };
-  const toggle = (
-    <Seg label="Challenge" value={c ? 'on' : 'off'} onChange={v => setCh(v === 'on')} options={[{ value: 'off', label: 'Free flight' }, { value: 'on', label: 'Formation' }]} />
-  );
   if (c) return (
     <>
-      <Fig title="Challenge: Formation" className="challenge" actions={toggle}>
-        <FormationPanel snap={snap} sim={sim} refresh={refresh} />
-      </Fig>
-      <div className="deck"><PlayPause paused={paused} setPaused={setPaused} /></div>
+      <ChallengeCard title="Fly in formation" onExit={() => setCh(false)}>
+        <FormationPanel snap={snap} sim={sim} refresh={refresh} paused={paused} setPaused={setPaused} />
+      </ChallengeCard>
     </>
   );
   const firing = snap.F > 0;
@@ -287,9 +302,7 @@ export function Mode2Panel({ snap, sim, paused, setPaused, reset, refresh }) {
         <div className="gwrap"><SpeedGraph hist={snap.hist} t={snap.t} /></div>
         <Rules items={RULES2} active={firing ? [0] : [3]} />
       </Fig>
-      <Fig title="Challenge: Formation" className="challenge" actions={toggle}>
-        <p className="hint">Set the force on three ships of different mass so they all accelerate at the same rate. Three rounds.</p>
-      </Fig>
+      <ChallengeBar title="Fly in formation" blurb="Give three ships of different mass the same acceleration. Three rounds." onStart={() => setCh(true)} />
       <div className="deck">
         <PlayPause paused={paused} setPaused={setPaused} />
         <button className="btn ghost" onClick={blur(reset)}>Reset</button>

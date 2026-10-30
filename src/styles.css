@@ -21,7 +21,7 @@ body{margin:0;background:#0f171c;color:var(--ink);font-family:"Atkinson Hyperleg
 .lede{margin:0 auto 16px;color:var(--muted);font-size:18px;max-width:60ch}
 .favicon-link{position:absolute;top:0;right:10px;display:inline-block;line-height:0;transition:transform .2s ease}
 .favicon-link:hover,.favicon-link:focus-visible{transform:scale(1.15) rotate(10deg)}
-.favicon-img{width:72px;height:72px;display:block}
+.favicon-img{width:65px;height:65px;display:block}
 .iconbtn{display:inline-grid;place-items:center;width:38px;height:38px;padding:0;margin-left:auto}
 .iconbtn svg{width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .top .iconbtn{position:absolute;top:4px;left:0;width:54px;height:54px;margin:0}
@@ -247,7 +247,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(-
 @media (max-height:820px){
   .app.fit .lede{display:none}
   .app.fit .top h1{font-size:32px;margin-bottom:12px}
-  .app.fit .favicon-img{width:54px;height:54px}
+  .app.fit .favicon-img{width:49px;height:49px}
   .app.fit .top{min-height:62px}   /* keeps the tabs and law clear of the corner icons */
   .app.fit .bottom-block{display:none}
 }
@@ -268,7 +268,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(-
   .side-right{display:none}
   .side-below{display:inline}
   .app{padding:18px 16px 24px}
-  .favicon-img{width:52px;height:52px}
+  .favicon-img{width:47px;height:47px}
   .top h1{padding:0 56px}
   .iconbtn{display:none}
   .stage{aspect-ratio:4/5}
@@ -292,3 +292,14 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(-
 .modes.single{--lawW:clamp(260px,40vw,560px)}
 .modetab.static{cursor:default}
 .modes.single .navlaw{font-size:16.5px}
+
+/* challenge: a slim invitation, then a full card */
+.eyebrow{display:block;font-size:11.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--mode)}
+.chbar{display:flex;align-items:center;gap:14px;padding:12px 14px 12px 16px;border-radius:14px;border:1.5px dashed color-mix(in srgb,var(--mode) 55%,var(--line));background:color-mix(in srgb,var(--mode) 7%,var(--paper))}
+.chbar-txt{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.3}
+.chbar-txt b{font-size:16px}
+.chbar-txt small{color:var(--muted);font-size:13.5px}
+.chbar .btn{flex:none}
+.challenge.on{border:1.5px solid var(--mode);border-left-width:4px;box-shadow:0 0 18px color-mix(in srgb,var(--mode) 18%,transparent)}
+.chtitle h2{margin-top:1px}
+.exitbtn{font-size:13.5px;padding:6px 12px}
